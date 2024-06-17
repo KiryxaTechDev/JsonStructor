@@ -30,8 +30,8 @@ setup(
     long_description=long_discription,
     long_description_content_type='text/markdown',
 
-    url='https://github.com/KiryxaTechDev/Jsoner',
-    download_url=f'https://github.com/KiryxaTechDev/Jsoner/archive/refs/tags/{version}.zip',
+    url='https://github.com/KiryxaTechDev/JsonStructor',
+    download_url=f'https://github.com/KiryxaTechDev/JsonStructor/archive/refs/tags/{version}.zip',
 
     packages=['jsoner'],
 
