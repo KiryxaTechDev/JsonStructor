@@ -1,13 +1,13 @@
-# Jsoner Library
+# JsonStructor Library
 
-The `jsoner` library is a Python package that simplifies working with JSON files. It provides methods to read, write, add, remove, and replace elements in a JSON file.
+The `JsonStructor` library is a Python package that simplifies working with JSON files. It provides methods to read, write, add, remove, and replace elements in a JSON file.
 
 ## Installation
 
-You can install the `jsoner` library directly from PyPI:
+You can install the `JsonStructor` library directly from PyPI:
 
 ```bash
-pip install jsoner
+pip install JsonStructor
 ```
 
 ## Features
@@ -21,10 +21,10 @@ pip install jsoner
 
 ### Initialization
 
-Import the `JsonFile` class from the `jsoner` package and initialize it with the path to your JSON file.
+Import the `JsonFile` class from the `JsonStructor` package and initialize it with the path to your JSON file.
 
 ```python
-from jsoner import JsonFile
+from JsonStructor import JsonFile
 
 json_file = JsonFile('path/to/your/file.json')
 ```
@@ -65,7 +65,7 @@ json_file.remove_key('key_to_remove')
 
 ## Error Handling
 
-The `jsoner` library includes error handling for common issues such as non-existent files or invalid JSON content.
+The `JsonStructor` library includes error handling for common issues such as non-existent files or invalid JSON content.
 
 ## Documentation
 
@@ -73,7 +73,7 @@ Each method in the `JsonFile` class has detailed docstrings with parameters, ret
 
 ## Examples
 
-Below are some examples demonstrating how to use the `jsoner` library:
+Below are some examples demonstrating how to use the `JsonStructor` library:
 
 ### Reading from a File
 
@@ -116,7 +116,7 @@ json_file = JsonFile('data.json')
 json_file.remove_key('key_to_remove')
 ```
 
-For more information and advanced usage, refer to the docstrings provided within the `jsoner.py` module.
+For more information and advanced usage, refer to the docstrings provided within the `JsonStructor.py` module.
 ```
 
-This markdown document can be used as part of your project's README.md or as standalone documentation for users who want to install and use the `jsoner` library.
+This markdown document can be used as part of your project's README.md or as standalone documentation for users who want to install and use the `JsonStructor` library.

@@ -21,11 +21,11 @@ setup(
     author='KirycaTech',
     author_email='kiryxatech@gmail.com',
 
-    description=(u'The `jsoner` library is a Python package that simplifies the process '
+    description=(u'The `JsonStructor` library is a Python package that simplifies the process '
                  u'of working with JSON files. It offers a user-friendly interface for '
                  u'reading, writing, and editing JSON data, making it easy to add, remove, '
                  u'or alter key-value pairs in a JSON file. Ideal for developers who need '
-                 u'to interact with JSON data in their applications, `jsoner` streamlines '
+                 u'to interact with JSON data in their applications, `JsonStructor` streamlines '
                  u'common JSON operations with its straightforward and intuitive methods.'),
     long_description=long_discription,
     long_description_content_type='text/markdown',

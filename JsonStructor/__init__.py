@@ -5,4 +5,4 @@
 :copyright: (c) 2024 KiryxaTech
 """
 
-from .jsoner import (JsonFile,)
+from .JsonStructor import (JsonFile,)
