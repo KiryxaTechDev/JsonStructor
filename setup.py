@@ -33,7 +33,7 @@ setup(
     url='https://github.com/KiryxaTechDev/JsonStructor',
     download_url=f'https://github.com/KiryxaTechDev/JsonStructor/archive/refs/tags/{version}.zip',
 
-    packages=['jsoner'],
+    packages=['JsonStructor'],
 
     classifiers=[
         'License :: OSI Approved :: Apache Software License',
