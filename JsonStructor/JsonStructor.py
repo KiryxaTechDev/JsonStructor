@@ -74,8 +74,26 @@ class JsonFile:
                 json.dump(data, f, indent=4)
         except Exception as e:
             raise e
+        
+    def update_key(self, key: str, value: Any):
+        """
+        Updates the value of an existing key in the JSON file.
 
-    def add_new_key(self, new_key: str, value: Any):
+        If the key does not exist, it will be added to the file.
+
+        Parameters:
+            key (str): The key to update in the JSON file.
+            value (Any): The new value to associate with the key.
+
+        Raises:
+            Exception: If there is an error reading or writing to the file.
+        """
+        file_data = self.get()
+        file_data[key] = value
+        self.set(file_data)
+
+
+    def add_key(self, new_key: str, value: Any):
         """
         Adds a new key-value pair to the JSON file if it does not already exist.
         
