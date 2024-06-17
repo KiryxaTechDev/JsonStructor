@@ -75,53 +75,78 @@ class JsonFile:
         except Exception as e:
             raise e
         
-    def update_key(self, key: str, value: Any):
+    def update_key(self, key_path: str, value: Any):
         """
-        Updates the value of an existing key in the JSON file.
+        Updates the value of an existing key or nested key in the JSON file.
 
-        If the key does not exist, it will be added to the file.
+        If the key does not exist at any level, it will be added.
 
         Parameters:
-            key (str): The key to update in the JSON file.
+            key_path (str): The path to the key or nested key to update in the JSON file.
+                            Use dots to separate keys for nested objects.
             value (Any): The new value to associate with the key.
 
         Raises:
             Exception: If there is an error reading or writing to the file.
         """
         file_data = self.get()
-        file_data[key] = value
+        keys = key_path.split('/')
+        data = file_data
+        for key in keys[:-1]:  # Go through all keys except the last one
+            data = data.setdefault(key, {})  # Set default if key does not exist
+        data[keys[-1]] = value  # Set the value for the last key
         self.set(file_data)
 
 
-    def add_key(self, new_key: str, value: Any):
+    def add_key(self, key_path: str, value: Any):
         """
         Adds a new key-value pair to the JSON file if it does not already exist.
-        
+        Supports adding nested key-value pairs using '/' as a separator.
+
         Parameters:
-            new_key (str): The key to add to the JSON file.
+            key_path (str): The path to the key or nested key to add to the JSON file.
+                            Use '/' to separate keys for nested objects.
             value (Any): The value associated with the key in the JSON file.
-            
+
         Raises:
-            KeyError: If the key already exists in the JSON file.
+            KeyError: If the key already exists in the JSON file at any level.
         """
         file_data = self.get()
-        if new_key in file_data:
-            raise KeyError(f"The key {new_key} already exists.")
-        file_data[new_key] = value
+        keys = key_path.split('/')
+        data = file_data
+        for key in keys[:-1]:  # Go through all keys except the last one
+            if key not in data:
+                data[key] = {}  # Create a new dict if key does not exist
+            else:
+                if not isinstance(data[key], dict):
+                    raise KeyError(f"Key path {'/'.join(keys[:keys.index(key)])} is not a nested object.")
+            data = data[key]
+        if keys[-1] in data:
+            raise KeyError(f"The key {'/'.join(keys)} already exists.")
+        data[keys[-1]] = value  # Set the value for the last key
         self.set(file_data)
 
-    def remove_key(self, key_to_remove: str):
+
+    def remove_key(self, key_path: str):
         """
-        Removes a key-value pair from the JSON file if it exists.
+        Removes a key-value pair or a nested key-value pair from the JSON file if it exists.
+        Supports removing nested keys using '/' as a separator.
 
         Parameters:
-            key_to_remove (str): The key to remove from the JSON file.
+            key_path (str): The path to the key or nested key to remove from the JSON file.
+                            Use '/' to separate keys for nested objects.
 
         Raises:
-            KeyError: If the key does not exist in the JSON file.
+            KeyError: If the key path does not exist in the JSON file at any level.
         """
         file_data = self.get()
-        if key_to_remove not in file_data:
-            raise KeyError(f"The key {key_to_remove} does not exist.")
-        del file_data[key_to_remove]
+        keys = key_path.split('/')
+        data = file_data
+        for key in keys[:-1]:  # Go through all keys except the last one
+            if key not in data or not isinstance(data[key], dict):
+                raise KeyError(f"Key path {'/'.join(keys[:keys.index(key) + 1])} does not exist.")
+            data = data[key]
+        if keys[-1] not in data:
+            raise KeyError(f"The key {'/'.join(keys)} does not exist.")
+        del data[keys[-1]]  # Remove the value for the last key
         self.set(file_data)

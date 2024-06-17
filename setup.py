@@ -9,7 +9,7 @@ from setuptools import setup
 :copyright: (c) 2024 KiryxaTech
 """
 
-version = "0.0.2"
+version = "0.0.3"
 
 with open('README.md', encoding='utf-8') as f:
     long_discription = f.read()
@@ -18,7 +18,7 @@ setup(
     name='JsonStructor',
     version=version,
 
-    author='KirycaTech',
+    author='KiryxaTech',
     author_email='kiryxatech@gmail.com',
 
     description=(u'The `JsonStructor` library is a Python package that simplifies the process '
