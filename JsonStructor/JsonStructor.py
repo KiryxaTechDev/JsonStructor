@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 from typing import Dict, Union, Any
 
+from .Exceptions.Exceptions import KeyDuplicateError
 
 class JsonFile:
     """
@@ -167,7 +168,7 @@ class JsonUnion(JsonFile):
             
             for key in current_dict:
                 if key in merged_dict and not self.replace_duplicates:
-                    raise KeyError(f"Duplicate key found: {key}")
+                    raise KeyDuplicateError(key)
                 merged_dict[key] = current_dict[key]
 
         with open(self.output_fp, 'w', encoding=self._encoding) as f:

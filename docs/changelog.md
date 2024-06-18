@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 0.0.6
+Added Exceptions package.
+
 ## Version 0.0.5
 Support `JsonUnion`.
 
