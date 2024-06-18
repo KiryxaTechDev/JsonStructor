@@ -5,4 +5,4 @@
 :copyright: (c) 2024 KiryxaTech
 """
 
-from .JsonStructor import (JsonFile,)
+from .JsonStructor import (JsonFile, JsonUnion)
