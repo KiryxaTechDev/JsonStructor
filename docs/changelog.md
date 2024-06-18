@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 0.0.5
+Support `JsonUnion`.
+
 ## Version 0.0.4
 ### Overview
 Added the `JsonUnion` class is designed to merge multiple JSON files or dictionaries into a single JSON file, with an option to handle duplicate keys.
