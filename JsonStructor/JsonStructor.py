@@ -10,6 +10,7 @@ from typing import Dict, Union, Any
 
 from .Exceptions import (KeyDuplicateError, KeyNotFoundError, NotJsonFileError)
 
+
 class JsonFile:
     """
     A class for handling JSON file operations.
@@ -114,6 +115,27 @@ class JsonFile:
         except KeyError:
             raise KeyNotFoundError(key_path)
         self._write(data)
+
+    def clean(self):
+        """
+        Cleaning all keys from the JSON file.
+        """
+        self._write({})
+
+    def key_exists(self, key_path) -> bool:
+        """
+        Returns True if the key exists and False if it does not exist.
+        """
+        try:
+            data = self._read()
+            keys = key_path.split('/')
+            sub_data = self._navigate_to_key(data, keys)
+        except KeyError:
+            raise KeyNotFoundError(sub_data)
+
+        if keys[-1] in sub_data:
+            return True
+        return False
 
 
 class JsonUnion(JsonFile):

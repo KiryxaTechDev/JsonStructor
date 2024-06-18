@@ -1,7 +1,10 @@
 # Change Log
 
+## Version 0.0.10
+Added `clean` and `key_exists` method in `JsonFile` class.
+
 ## Version 0.0.9
-Fized bug with ModuleNotFoundError.
+Fixed bug with ModuleNotFoundError.
 
 ## Version 0.0.8
 Refactoring the lbrary.
