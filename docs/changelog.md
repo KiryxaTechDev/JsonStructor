@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 0.0.9
+Fized bug with ModuleNotFoundError.
+
 ## Version 0.0.8
 Refactoring the lbrary.
 
