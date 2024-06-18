@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 from typing import Dict, Union, Any
 
-from .Exceptions.Exceptions import KeyDuplicateError
+from .Exceptions import *
 
 class JsonFile:
     """
@@ -37,16 +37,16 @@ class JsonFile:
     
     def __init__(self, json_fp: Union[str, Path], encoding: str = 'utf-8'):
         if not Path(json_fp).is_file() or not str(json_fp).endswith('.json'):
-            raise ValueError("The file path must point to a .json file.")
+            raise NotJsonFileError(json_fp)
         self.json_fp = json_fp
-        self.encoding = encoding
+        self._encoding = encoding
 
     def _read(self) -> dict:
-        with open(self.json_fp, encoding=self.encoding) as f:
+        with open(self.json_fp, encoding=self._encoding) as f:
             return json.load(f)
 
     def _write(self, data: dict):
-        with open(self.json_fp, 'w', encoding=self.encoding) as f:
+        with open(self.json_fp, 'w', encoding=self._encoding) as f:
             json.dump(data, f, indent=4)
 
     def get(self) -> dict:
@@ -95,7 +95,7 @@ class JsonFile:
         keys = key_path.split('/')
         sub_data = self._navigate_to_key(data, keys)
         if keys[-1] in sub_data:
-            raise KeyError(f"The key {'/'.join(keys)} already exists.")
+            raise KeyDuplicateError('/'.join(keys))
         sub_data[keys[-1]] = value
         self._write(data)
 
@@ -109,7 +109,10 @@ class JsonFile:
         data = self._read()
         keys = key_path.split('/')
         sub_data = self._navigate_to_key(data, keys)
-        del sub_data[keys[-1]]
+        try:
+            del sub_data[keys[-1]]
+        except KeyError:
+            raise KeyNotFoundError(key_path)
         self._write(data)
 
 
@@ -142,7 +145,7 @@ class JsonUnion(JsonFile):
             encoding (str): The encoding format used to read and write JSON files. Defaults to 'utf-8'.
         """
         self.file_paths = file_paths
-        self.output_fp = output_fp
+        self.json_fp = self.output_fp = output_fp
         self.replace_duplicates = replace_duplicates
         self._encoding = encoding
 

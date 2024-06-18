@@ -6,3 +6,4 @@
 """
 
 from .JsonStructor import (JsonFile, JsonUnion)
+from . import Exceptions

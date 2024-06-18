@@ -1,7 +1,10 @@
 # Change Log
 
+## Version 0.0.7
+Added more exceptions.
+
 ## Version 0.0.6
-Added Exceptions package.
+Added `Exceptions` package.
 
 ## Version 0.0.5
 Support `JsonUnion`.
