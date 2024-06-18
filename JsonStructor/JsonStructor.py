@@ -6,147 +6,169 @@
 """
 import json
 from pathlib import Path
-from typing import Union, Any
+from typing import Dict, Union, Any
 
 
 class JsonFile:
     """
-    A class to handle reading and writing JSON files.
-    
+    A class for handling JSON file operations.
+
     Attributes:
-        __json_fp (Union[str, Path]): The file path to the JSON file.
-        __encoding (str): The encoding format used to read/write the file.
-        
+        json_fp (Union[str, Path]): The path to the JSON file.
+        encoding (str): The encoding of the JSON file.
+
     Methods:
-        get: Reads and returns the content of the JSON file.
-        set: Writes a dictionary to the JSON file.
-        add_new_key: Adds a new key-value pair to the JSON file.
-        remove_key: Removes a key-value pair from the JSON file.
-        replace_value: Replaces the value of an existing key in the JSON file.
-    """
-    def __init__(self, json_fp: Union[str, Path], encoding: str = 'utf-8'):
-        """
-        Initializes the JsonFile object with a file path and encoding.
+        get() -> dict:
+            Returns the content of the JSON file.
         
-        Parameters:
-            json_fp (Union[str, Path]): The file path to the JSON file.
-            encoding (str): The encoding format used to read/write the file.
-            
-        Raises:
-            ValueError: If the provided file path does not point to a .json file.
-        """
+        set(data: dict):
+            Writes the provided dictionary to the JSON file.
+        
+        update_key(key_path: str, value: Any):
+            Updates the value of a specified key in the JSON file.
+        
+        add_key(key_path: str, value: Any):
+            Adds a new key-value pair to the JSON file.
+        
+        remove_key(key_path: str):
+            Removes a specified key from the JSON file.
+    """
+    
+    def __init__(self, json_fp: Union[str, Path], encoding: str = 'utf-8'):
         if not Path(json_fp).is_file() or not str(json_fp).endswith('.json'):
             raise ValueError("The file path must point to a .json file.")
-        self.__json_fp = json_fp
-        self.__encoding = encoding
+        self.json_fp = json_fp
+        self.encoding = encoding
 
-    def get(self) -> dict:    
-        """
-        Reads and returns the content of the JSON file as a dictionary.
-        
-        Returns:
-            dict: The content of the JSON file.
-            
-        Raises:
-            FileNotFoundError: If the JSON file does not exist.
-            json.JSONDecodeError: If the JSON file cannot be decoded.
-        """
-        try:
-            with open(self.__json_fp, encoding=self.__encoding) as f:
-                return json.load(f)
-        except FileNotFoundError:
-            raise FileNotFoundError(f"The file {self.__json_fp} does not exist.")
-        except json.JSONDecodeError:
-            raise json.JSONDecodeError("Failed to decode JSON.")
+    def _read(self) -> dict:
+        with open(self.json_fp, encoding=self.encoding) as f:
+            return json.load(f)
+
+    def _write(self, data: dict):
+        with open(self.json_fp, 'w', encoding=self.encoding) as f:
+            json.dump(data, f, indent=4)
+
+    def get(self) -> dict:
+        """Returns the content of the JSON file."""
+        return self._read()
 
     def set(self, data: dict):
-        """
-        Writes a dictionary to the JSON file.
-        
-        Parameters:
-            data (dict): The data to write to the JSON file.
-            
-        Raises:
-            Exception: If there is an error writing to the file.
-        """
-        try:
-            with open(self.__json_fp, 'w', encoding=self.__encoding) as f:
-                json.dump(data, f, indent=4)
-        except Exception as e:
-            raise e
-        
+        """Writes the provided dictionary to the JSON file."""
+        self._write(data)
+
+    def _update_dict(self, data: dict, keys: list, value: Any):
+        for key in keys[:-1]:
+            data = data.setdefault(key, {})
+        data[keys[-1]] = value
+
+    def _navigate_to_key(self, data: dict, keys: list) -> dict:
+        for key in keys[:-1]:
+            data = data[key]
+        return data
+
     def update_key(self, key_path: str, value: Any):
         """
-        Updates the value of an existing key or nested key in the JSON file.
+        Updates the value of a specified key in the JSON file.
 
-        If the key does not exist at any level, it will be added.
-
-        Parameters:
-            key_path (str): The path to the key or nested key to update in the JSON file.
-                            Use dots to separate keys for nested objects.
-            value (Any): The new value to associate with the key.
-
-        Raises:
-            Exception: If there is an error reading or writing to the file.
+        Args:
+            key_path (str): The key path, separated by '/'.
+            value (Any): The new value for the specified key.
         """
-        file_data = self.get()
+        data = self._read()
         keys = key_path.split('/')
-        data = file_data
-        for key in keys[:-1]:  # Go through all keys except the last one
-            data = data.setdefault(key, {})  # Set default if key does not exist
-        data[keys[-1]] = value  # Set the value for the last key
-        self.set(file_data)
-
+        self._update_dict(data, keys, value)
+        self._write(data)
 
     def add_key(self, key_path: str, value: Any):
         """
-        Adds a new key-value pair to the JSON file if it does not already exist.
-        Supports adding nested key-value pairs using '/' as a separator.
+        Adds a new key-value pair to the JSON file.
 
-        Parameters:
-            key_path (str): The path to the key or nested key to add to the JSON file.
-                            Use '/' to separate keys for nested objects.
-            value (Any): The value associated with the key in the JSON file.
-
+        Args:
+            key_path (str): The key path, separated by '/'.
+            value (Any): The value for the new key.
+        
         Raises:
-            KeyError: If the key already exists in the JSON file at any level.
+            KeyError: If the key already exists.
         """
-        file_data = self.get()
+        data = self._read()
         keys = key_path.split('/')
-        data = file_data
-        for key in keys[:-1]:  # Go through all keys except the last one
-            if key not in data:
-                data[key] = {}  # Create a new dict if key does not exist
-            else:
-                if not isinstance(data[key], dict):
-                    raise KeyError(f"Key path {'/'.join(keys[:keys.index(key)])} is not a nested object.")
-            data = data[key]
-        if keys[-1] in data:
+        sub_data = self._navigate_to_key(data, keys)
+        if keys[-1] in sub_data:
             raise KeyError(f"The key {'/'.join(keys)} already exists.")
-        data[keys[-1]] = value  # Set the value for the last key
-        self.set(file_data)
-
+        sub_data[keys[-1]] = value
+        self._write(data)
 
     def remove_key(self, key_path: str):
         """
-        Removes a key-value pair or a nested key-value pair from the JSON file if it exists.
-        Supports removing nested keys using '/' as a separator.
+        Removes a specified key from the JSON file.
 
-        Parameters:
-            key_path (str): The path to the key or nested key to remove from the JSON file.
-                            Use '/' to separate keys for nested objects.
+        Args:
+            key_path (str): The key path, separated by '/'.
+        """
+        data = self._read()
+        keys = key_path.split('/')
+        sub_data = self._navigate_to_key(data, keys)
+        del sub_data[keys[-1]]
+        self._write(data)
+
+
+class JsonUnion(JsonFile):
+    """
+    A class for merging multiple JSON files or dictionaries into a single JSON file.
+
+    Attributes:
+        file_paths (Tuple[Union[str, Path,
+                          Dict[Any, Any], JsonFile]]): The paths to the JSON files, dictionaries, or JsonFile objects to be merged.
+        output_fp (Union[str, Path]): The file path for the output JSON file.
+        replace_duplicates (bool): Determines whether duplicate keys should be replaced by the last one encountered. Defaults to False.
+        _encoding (str): The encoding format used to read and write JSON files. Defaults to 'utf-8'.
+
+    Methods:
+        merge():
+            Merges any number of JSON files or dictionaries and writes the result to the output
+            file. If replace_duplicates is True, duplicate keys will be replaced by the last one
+            encountered. Otherwise, a KeyError will be raised if duplicates are found.
+    """
+    
+    def __init__(self, *file_paths: Union[str, Path, Dict[Any, Any], JsonFile], output_fp: Union[str, Path], replace_duplicates: bool = False, encoding: str = 'utf-8'):
+        """
+        Initializes the JsonUnion object with multiple JSON file paths or dictionaries.
+
+        Args:
+            *file_paths (Union[str, Path, Dict[Any, Any], JsonFile]): Variable number of arguments that can be file paths as strings or Path objects, dictionaries, or JsonFile objects.
+            output_fp (Union[str, Path]): The file path for the output JSON file.
+            replace_duplicates (bool): If set to True, duplicate keys will be replaced by the last one encountered. Defaults to False.
+            encoding (str): The encoding format used to read and write JSON files. Defaults to 'utf-8'.
+        """
+        self.file_paths = file_paths
+        self.output_fp = output_fp
+        self.replace_duplicates = replace_duplicates
+        self._encoding = encoding
+
+    def merge(self):
+        """
+        Merges any number of JSON files or dictionaries and writes the result to the output file.
+        If replace_duplicates is True, duplicate keys will be replaced by the last one encountered.
+        Otherwise, a KeyError will be raised if duplicates are found.
 
         Raises:
-            KeyError: If the key path does not exist in the JSON file at any level.
+            KeyError: If replace_duplicates is False and duplicate keys are encountered.
         """
-        file_data = self.get()
-        keys = key_path.split('/')
-        data = file_data
-        for key in keys[:-1]:  # Go through all keys except the last one
-            if key not in data or not isinstance(data[key], dict):
-                raise KeyError(f"Key path {'/'.join(keys[:keys.index(key) + 1])} does not exist.")
-            data = data[key]
-        if keys[-1] not in data:
-            raise KeyError(f"The key {'/'.join(keys)} does not exist.")
-        del data[keys[-1]]  # Remove the value for the last key
-        self.set(file_data)
+        merged_dict = {}
+        for file_path in self.file_paths:
+            current_dict = {}
+            if isinstance(file_path, JsonFile):
+                current_dict = file_path.get()
+            elif isinstance(file_path, dict):
+                current_dict = file_path
+            elif isinstance(file_path, (str, Path)):
+                with open(file_path, 'r', encoding=self._encoding) as f:
+                    current_dict = json.load(f)
+            
+            for key in current_dict:
+                if key in merged_dict and not self.replace_duplicates:
+                    raise KeyError(f"Duplicate key found: {key}")
+                merged_dict[key] = current_dict[key]
+
+        with open(self.output_fp, 'w', encoding=self._encoding) as f:
+            json.dump(merged_dict, f, indent=4)
