@@ -6,4 +6,4 @@
 """
 
 from .JsonStructor import (JsonFile, JsonUnion)
-from . import Exceptions
+from .Exceptions import (KeyDuplicateError, KeyNotFoundError, NotJsonFileError)

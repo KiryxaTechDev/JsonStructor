@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 0.0.8
+Refactoring the lbrary.
+
 ## Version 0.0.7
 Added more exceptions.
 
